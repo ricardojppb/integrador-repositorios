@@ -1,32 +1,29 @@
 package com.indra.repos;
 
 
-import com.cdancy.bitbucket.rest.BitbucketClient;
-import com.cdancy.bitbucket.rest.features.BranchApi;
-import com.cdancy.bitbucket.rest.features.CommitsApi;
+import com.indra.repos.git.model.dto.Branches;
+import com.indra.repos.git.model.dto.Commits;
+import com.indra.repos.git.model.repository.BrancheMongoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.net.URI;
 import java.nio.charset.Charset;
 
 @Slf4j
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class IntegradorRepositoriosApplication implements CommandLineRunner {
-    RestTemplate restTemplate = new RestTemplate();
+
+    RestTemplate restTemplate = null;
+
+    @Autowired
+    private BrancheMongoRepository brancheMongoRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(IntegradorRepositoriosApplication.class, args);
@@ -103,8 +100,11 @@ public class IntegradorRepositoriosApplication implements CommandLineRunner {
 //        CommitsApi commitsApi = client.api().commitsApi();
 //
         System.out.println("*********** Get All Commits for Rest ***********");
-        String url = "https://bitbucket.indra.es/rest/api/1.0/" +
-                "projects/jpa/repos/sefazpb-atf/commits?exclude=master&limit=1000";
+        String url = "https://bitbucket.indra.es/rest/api/1.0/";
+        String urlCommits = url + "projects/jpa/repos/sefazpb-atf/commits?limit=1000";
+
+        String urlBranchs = url + "projects/JPA/repos/sefazpb-atf/branches?limit=1000";
+
         String accessToken = "Bearer NzU0MjE0Nzg0Njk2Ouxl5cMM3a11g6W5dPtQmM7WMu1N";
         String auth = "Basic rasilvestres:048265LLrass022020";
 
@@ -123,26 +123,64 @@ public class IntegradorRepositoriosApplication implements CommandLineRunner {
 //
 //        ResponseEntity<String> response
 //                = restTemplate.exchange(request,String.class);
+        //HttpEntity<Commit> httpEntity = new HttpEntity<Commits>(createHeaders("rasilvestres", "048265LLrass022020"))
+        try {
 
-        ResponseEntity<String> response = restTemplate.exchange
-                (url, HttpMethod.GET, new HttpEntity<String>(createHeaders("rasilvestres", "048265LLrass022020")), String.class);
+            restTemplate = new RestTemplate();
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Status:" + HttpStatus.OK.name());
-            System.out.println("Body:" + response.getBody());
+            ResponseEntity<Commits> responseCommit = restTemplate.exchange
+                    (urlCommits, HttpMethod.GET, new HttpEntity<String>(createHeaders("rasilvestres", "048265LLrass022020")), Commits.class);
+
+            ResponseEntity<Branches> responseBranche = restTemplate.exchange
+                    (urlBranchs, HttpMethod.GET, new HttpEntity<String>(createHeaders("rasilvestres", "048265LLrass022020")), Branches.class);
+
+
+            if (responseCommit.getStatusCode() == HttpStatus.OK) {
+
+                System.out.println("Status:" + HttpStatus.OK.name());
+                System.out.println("Body:" + responseCommit.getBody().toString());
+
+            }
+
+            if (responseBranche.getStatusCode() == HttpStatus.OK) {
+
+                System.out.println("Status:" + HttpStatus.OK.name());
+                System.out.println("Body:" + responseBranche.getBody().toString());
+            }
+
+            Branches branches = responseBranche.getBody();
+
+            if (!branches.getValues().isEmpty()) {
+
+                if (branches.getIsLastPage() != null && !branches.getIsLastPage()) {
+
+                }
+                brancheMongoRepository.saveAll(branches.getValues());
+
+            }
+
+
+        } catch (Exception e) {
+
+            System.out.println("Message: " + e.getMessage());
+            System.out.println("LocalizedMessage:" + e.getLocalizedMessage());
+
+        } finally {
+
+            restTemplate = null;
+
         }
 
-        restTemplate = null;
 
     }
 
-    private HttpHeaders createHeaders(String username, String password){
+    private HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{
             String auth = username + ":" + password;
             byte[] encodedAuth = Base64.encodeBase64(
-                    auth.getBytes(Charset.forName("US-ASCII")) );
-            String authHeader = "Basic " + new String( encodedAuth );
-            set( "Authorization", authHeader );
+                    auth.getBytes(Charset.forName("US-ASCII")));
+            String authHeader = "Basic " + new String(encodedAuth);
+            set("Authorization", authHeader);
         }};
     }
 }

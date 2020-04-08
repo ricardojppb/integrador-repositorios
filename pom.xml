@@ -65,38 +65,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>com.cdancy</groupId>
-            <artifactId>bitbucket-rest</artifactId>
-            <version>2.2.0</version>
+            <groupId>com.konghq</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>3.7.01</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>se.bjurr.bitbucketcloud</groupId>-->
-<!--            <artifactId>bitbucket-cloud-java-rest-api</artifactId>-->
-<!--            <version>1.11</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.atlassian.bitbucket.server</groupId>-->
-<!--            <artifactId>bitbucket-rest</artifactId>-->
-<!--            <version>4.0.0-eap2</version>-->
-<!--&lt;!&ndash;            <scope>provided</scope>&ndash;&gt;-->
-<!--        </dependency>-->
-
-
-<!--        <dependency>-->
-<!--            <groupId>com.atlassian.bitbucket.server</groupId>-->
-<!--            <artifactId>bitbucket-git-api</artifactId>-->
-<!--            <version>4.0.0-eap2</version>-->
-<!--&lt;!&ndash;            <scope>provided</scope>&ndash;&gt;-->
-<!--        </dependency>-->
-
-        <!--        <dependency>-->
-<!--            <groupId>com.atlassian.bitbucket.server</groupId>-->
-<!--            <artifactId>bitbucket-rest-api</artifactId>-->
-<!--            <version>4.0.0-eap2</version>-->
-<!--&lt;!&ndash;            <scope>provided</scope>&ndash;&gt;-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>
