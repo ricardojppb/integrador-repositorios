@@ -33,3 +33,5 @@ build/
 /mvnw.cmd
 /repos/**
 
+/docker/mysql/mysql-volume/
+/docker/mongodb/mongo-volume/
