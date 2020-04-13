@@ -1,4 +1,4 @@
-package com.indra.repos.properties;
+package com.indra.repos.git.properties;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "git")
+@ConfigurationProperties(prefix = "git.bitbucket")
 public class GitProperties {
 
     @NotBlank

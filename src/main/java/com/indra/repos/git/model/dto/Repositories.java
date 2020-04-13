@@ -1,5 +1,6 @@
 package com.indra.repos.git.model.dto;
 
+import com.indra.repos.git.model.domain.Repository;
 import lombok.Getter;
 import lombok.Setter;
 

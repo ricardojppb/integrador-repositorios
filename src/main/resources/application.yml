@@ -2,6 +2,10 @@ server:
   port: 8080
 
 spring:
+  batch:
+    job:
+      enabled: false
+    initialize-schema: always
   data:
     mongodb:
       host: localhost

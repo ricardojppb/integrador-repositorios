@@ -1,6 +1,6 @@
-package com.indra.repos.configurarion;
+package com.indra.repos.git.configurarion;
 
-import com.indra.repos.properties.GitProperties;
+import com.indra.repos.git.properties.GitProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;

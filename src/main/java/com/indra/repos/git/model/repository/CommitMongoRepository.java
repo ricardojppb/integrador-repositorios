@@ -1,6 +1,6 @@
 package com.indra.repos.git.model.repository;
 
-import com.indra.repos.git.model.dto.Commit;
+import com.indra.repos.git.model.domain.Commit;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
