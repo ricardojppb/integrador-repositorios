@@ -5,9 +5,12 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -20,14 +23,28 @@ import java.util.Date;
 public class Commit implements Serializable {
 
     @Id
+    private ObjectId sq;
+    @Indexed
+    @Field("commit_id")
     private String id;
+    @Field("commit_ref")
     private String displayId;
     private Author author;
     private String message;
     private Date committerTimestamp;
+    @Indexed
     private int index;
     @DBRef
+    @Indexed(name = "Commit_Branche")
     private Branche branche;
+
+    public ObjectId getSq() {
+        return sq;
+    }
+
+    public void setSq(ObjectId sq) {
+        this.sq = sq;
+    }
 
     public String getId() {
         return id;

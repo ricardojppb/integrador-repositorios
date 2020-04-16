@@ -48,7 +48,7 @@ public class RepositoryMongoService extends GenericService {
             Repository repository = mongoTemplate.findOne(query, Repository.class);
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
-            Optional.of(repository).ifPresent(r -> start.set(r.getIndex() + 1));
+            Optional.ofNullable(repository).ifPresent(r -> start.set(r.getIndex() + 1));
 
             HttpResponse<Repositories> response = Unirest.get(gitProperties.getRepos())
                     .routeParam("projects", p.getKey())
@@ -63,7 +63,7 @@ public class RepositoryMongoService extends GenericService {
                 cRepos.forEach(cr -> {
                     cr.setProject(p);
                 });
-                Optional.of(responseBodyRepositories).ifPresent(or -> repositories.add(or));
+                Optional.ofNullable(responseBodyRepositories).ifPresent(or -> repositories.add(or));
             }
 
         });
@@ -78,10 +78,10 @@ public class RepositoryMongoService extends GenericService {
     public Collection<Repository> mongoGetRepositories(Collection<Repositories> repositories) {
 
         Collection<Repository> repositoryCollection = new ConcurrentLinkedQueue<>();
-        Optional.of(repositories).ifPresent(repos -> {
+        Optional.ofNullable(repositories).ifPresent(repos -> {
             repos.forEach(r -> {
                 Collection<Repository> cRepository = r.getValues();
-                cRepository.removeIf(repository -> repositoryMongoRepository.existsById(repository.getId()));
+                cRepository.removeIf(repository -> repositoryMongoRepository.existsByIdAndProject(repository.getId(), repository.getProject()));
 
                 AtomicInteger index = new AtomicInteger(r.getStart().intValue());
                 cRepository.forEach(repository -> {
@@ -100,7 +100,7 @@ public class RepositoryMongoService extends GenericService {
      */
     public void saveAllRepositories(Collection<Repository> repositories) {
 
-        Optional.of(repositories).ifPresent(repository -> repositoryMongoRepository.saveAll(repository));
+        Optional.ofNullable(repositories).ifPresent(repository -> repositoryMongoRepository.saveAll(repository));
 
     }
 

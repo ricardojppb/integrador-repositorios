@@ -58,12 +58,12 @@ public class ProjectBatch {
 
         @Override
         public void beforeJob(JobExecution jobExecution) {
-            log.info("{} - Projects beforeJob: execute", JobResultListener.class.getSimpleName());
+            //log.info("{} - Projects beforeJob: execute", JobResultListener.class.getSimpleName());
         }
 
         @Override
         public void afterJob(JobExecution jobExecution) {
-            log.info("{} - Projects afterJob: execute", JobResultListener.class.getSimpleName());
+            //log.info("{} - Projects afterJob: execute", JobResultListener.class.getSimpleName());
         }
     }
 

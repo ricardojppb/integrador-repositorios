@@ -52,7 +52,7 @@ public class BranchMongoService extends GenericService {
             Branche branche = mongoTemplate.findOne(query, Branche.class);
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
-            Optional.of(branche).ifPresent(b -> start.set(b.getIndex() + 1));
+            Optional.ofNullable(branche).ifPresent(b -> start.set(b.getIndex() + 1));
 
             HttpResponse<Branches> response = Unirest.get(gitProperties.getBranches())
                     .routeParam("projects", project.getKey())
@@ -68,7 +68,7 @@ public class BranchMongoService extends GenericService {
                 cBranches.forEach(cb -> {
                     cb.setRepository(repository);
                 });
-                Optional.of(responseBodyBranches).ifPresent(ob -> branches.add(ob));
+                Optional.ofNullable(responseBodyBranches).ifPresent(ob -> branches.add(ob));
             }
         });
 
@@ -82,10 +82,10 @@ public class BranchMongoService extends GenericService {
     public Collection<Branche> mongoGetBranches(Collection<Branches> branches) {
 
         Collection<Branche> brancheCollection = new ConcurrentLinkedQueue<>();
-        Optional.of(branches).ifPresent(oBranches -> {
+        Optional.ofNullable(branches).ifPresent(oBranches -> {
             oBranches.forEach(b -> {
                 Collection<Branche> cBranche = b.getValues();
-                cBranche.removeIf(branche -> brancheMongoRepository.existsById(branche.getId()));
+                cBranche.removeIf(branche -> brancheMongoRepository.existsByIdAndRepository(branche.getId(), branche.getRepository()));
 
                 AtomicInteger index = new AtomicInteger(b.getStart().intValue());
                 cBranche.forEach(branche -> {
@@ -102,6 +102,6 @@ public class BranchMongoService extends GenericService {
      * @param branches
      */
     public void saveAllBranches(Collection<Branche> branches) {
-        Optional.of(branches).ifPresent(branche -> brancheMongoRepository.saveAll(branche));
+        Optional.ofNullable(branches).ifPresent(branche -> brancheMongoRepository.saveAll(branche));
     }
 }

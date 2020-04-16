@@ -51,7 +51,7 @@ public class CommitMongoService extends GenericService {
             Commit commit = mongoTemplate.findOne(query, Commit.class);
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
-            Optional.of(commit).ifPresent(c -> start.set(c.getIndex() + 1));
+            Optional.ofNullable(commit).ifPresent(c -> start.set(c.getIndex() + 1));
 
             HttpResponse<Commits> response = Unirest.get(gitProperties.getRepos())
                     .routeParam("projects", project.getKey())
@@ -68,7 +68,7 @@ public class CommitMongoService extends GenericService {
                 cCommits.forEach(cb -> {
                     cb.setBranche(branche);
                 });
-                Optional.of(responseBodyCommits).ifPresent(oc -> commits.add(oc));
+                Optional.ofNullable(responseBodyCommits).ifPresent(oc -> commits.add(oc));
             }
         });
 
@@ -82,10 +82,10 @@ public class CommitMongoService extends GenericService {
     public Collection<Commit> mongoGetCommits(Collection<Commits> commits) {
 
         Collection<Commit> commitCollection = new ConcurrentLinkedQueue<>();
-        Optional.of(commits).ifPresent(oCommits -> {
+        Optional.ofNullable(commits).ifPresent(oCommits -> {
             oCommits.forEach(oc -> {
                 Collection<Commit> cCommit = oc.getValues();
-                cCommit.removeIf(commit -> commitMongoRepository.existsById(commit.getId()));
+                cCommit.removeIf(commit -> commitMongoRepository.existsByIdAndBranche(commit.getId(), commit.getBranche()));
 
                 AtomicInteger index = new AtomicInteger(oc.getStart().intValue());
                 cCommit.forEach(commit -> {
@@ -103,7 +103,7 @@ public class CommitMongoService extends GenericService {
      */
     public void saveAllCommits(Collection<Commit> commits) {
 
-        Optional.of(commits).ifPresent(commit -> commitMongoRepository.saveAll(commit));
+        Optional.ofNullable(commits).ifPresent(commit -> commitMongoRepository.saveAll(commit));
 
     }
 

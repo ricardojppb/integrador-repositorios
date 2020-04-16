@@ -31,14 +31,14 @@ public class ProjectMongoService extends GenericService {
      */
     public Projects restGetProject() {
 
-        log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
+        //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
         Projects projects = null;
         Query query = new Query();
         query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
         Project project = mongoTemplate.findOne(query, Project.class);
 
         AtomicReference<Integer> start = new AtomicReference<>(0);
-        Optional.of(project).ifPresent(p -> start.set(p.getIndex() + 1));
+        Optional.ofNullable(project).ifPresent(p -> start.set(p.getIndex() + 1));
 
         HttpResponse<Projects> response = Unirest.get(gitProperties.getProjects())
                 .routeParam("start", start.get().toString())
@@ -48,7 +48,7 @@ public class ProjectMongoService extends GenericService {
         if (response.getStatus() == HttpStatus.OK.value())
             projects = response.getBody();
 
-        log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
+        //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
         return projects;
     }
 
@@ -58,10 +58,10 @@ public class ProjectMongoService extends GenericService {
      */
     public Collection<Project> mongoGetProjects(Projects projects) {
 
-        log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
+        //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
 
         AtomicReference<Collection<Project>> projectCollection = new AtomicReference<>();
-        Optional.of(projects).ifPresent(p -> {
+        Optional.ofNullable(projects).ifPresent(p -> {
 
             projectCollection.set(projects.getValues());
 
@@ -74,7 +74,7 @@ public class ProjectMongoService extends GenericService {
         });
 
 
-        log.info("{}: Finish Get Projects", ProjectMongoService.class.getName());
+        //log.info("{}: Finish Get Projects", ProjectMongoService.class.getName());
         return projectCollection.get();
     }
 
@@ -82,11 +82,11 @@ public class ProjectMongoService extends GenericService {
      * @param projects
      */
     public void saveAllProject(Collection<Project> projects) {
-        log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
+        //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
 
-        Optional.of(projects).ifPresent(p -> projectMongoRepository.saveAll(p));
+        Optional.ofNullable(projects).ifPresent(p -> projectMongoRepository.saveAll(p));
 
-        log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
+        //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
     }
 
 }

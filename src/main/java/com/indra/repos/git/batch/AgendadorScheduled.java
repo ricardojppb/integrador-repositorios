@@ -7,7 +7,10 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 @Slf4j
 @Service
@@ -25,26 +28,35 @@ public class AgendadorScheduled {
 
 
     //@Scheduled(fixedDelay = HORA * 12, initialDelay = MINUTO)
+    @Async
     public void agendadorJobProject() {
         executarBatch("jobGitProject");
     }
 
     //@Scheduled(fixedDelay = MINUTO * 30, initialDelay = MINUTO)
+    @Async
     public void agendadorJobRepository() {
         executarBatch("jobGitRepository");
     }
 
     //@Scheduled(fixedDelay = HORA * 12, initialDelay = MINUTO)
+    @Async
     public void agendadorJobBranche() {
         executarBatch("jobGitBranche");
     }
 
     //@Scheduled(fixedDelay = MINUTO * 30, initialDelay = MINUTO)
+    @Async
     public void agendadorJobCommit() {
         executarBatch("jobGitCommit");
     }
 
+    @PostConstruct
     public void start() {
+        //agendadorJobRepository();
+        agendadorJobBranche();
+        //agendadorJobCommit();
+        //agendadorJobProject();
 
     }
 
