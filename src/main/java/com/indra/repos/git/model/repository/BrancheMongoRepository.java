@@ -4,9 +4,7 @@ import com.indra.repos.git.model.domain.Branche;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
 public interface BrancheMongoRepository extends MongoRepository<Branche, String> {
-    Optional<Branche> findById(String id);
+
 }

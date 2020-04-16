@@ -4,10 +4,7 @@ import com.indra.repos.git.model.domain.Project;
 import com.indra.repos.git.model.dto.Projects;
 import com.indra.repos.git.model.service.ProjectMongoService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -23,30 +20,29 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-public class JobProjectBatch {
+public class ProjectBatch {
 
+    private static final int MAX_ERRORS = 5;
+    private static final int TRANSACTION_SIZE = 1;
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
-
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
-
     @Autowired
     private ProjectMongoService projectMongoService;
 
-    private static final int MAX_ERRORS = 5;
-
-    private static final int TRANSACTION_SIZE = 20;
-
     @Bean
-    public Job jobProject() {
-        return jobBuilderFactory.get("jobProject").incrementer(new RunIdIncrementer())
-                .start(stepProject()).build();
+    public Job jobGitProject(JobCompletionNotificationListener listener, Step stepGitProject) {
+        return jobBuilderFactory.get("jobGitProject")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .listener(new JobResultListener())
+                .flow(stepGitProject).end().build();
     }
 
     @Bean
-    public Step stepProject() {
-        return stepBuilderFactory.get("stepProject").<Projects, Collection<Project>>chunk(TRANSACTION_SIZE)
+    public Step stepGitProject() {
+        return stepBuilderFactory.get("stepGitProject").<Projects, Collection<Project>>chunk(TRANSACTION_SIZE)
                 .reader(new ProjectItemReader())
                 .processor(new ProjectItemProcessor())
                 .writer(new ProjectItemWriter()).build();
@@ -74,13 +70,24 @@ public class JobProjectBatch {
     /**
      *
      */
-    public class ProjectItemReader implements ItemReader<Projects> {
+    public class ProjectItemReader implements ItemReader<Projects>, StepExecutionListener {
 
         @Override
         public Projects read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+            log.info("ProjectItemReader.read execute.");
             Projects projects = projectMongoService.restGetProject();
-            log.info("{} - Projects read: {} ", ProjectItemReader.class.getSimpleName(), projects);
             return projects;
+        }
+
+        @Override
+        public void beforeStep(StepExecution stepExecution) {
+            log.info("ProjectItemReader.read initialized.");
+        }
+
+        @Override
+        public ExitStatus afterStep(StepExecution stepExecution) {
+            log.info("ProjectItemReader.read ended.");
+            return ExitStatus.COMPLETED;
         }
     }
 
@@ -91,25 +98,35 @@ public class JobProjectBatch {
 
         @Override
         public Collection<Project> process(Projects projects) throws Exception {
-
-            Collection<Project> collection = projectMongoService.mongoGetProjects(projects);
-            log.info("{} - Projects process: {} ", ProjectItemProcessor.class.getSimpleName(), collection);
-            return collection;
+            log.info("ProjectItemProcessor.process execute.");
+            Collection<Project> projs = projectMongoService.mongoGetProjects(projects);
+            return projs;
         }
     }
 
     /**
      *
      */
-    public class ProjectItemWriter implements ItemWriter<Collection<Project>> {
-
+    public class ProjectItemWriter implements ItemWriter<Collection<Project>>, StepExecutionListener {
 
         @Override
-        public void write(List<? extends Collection<Project>> list) throws Exception {
-            list.forEach(l -> {
-                log.info("{} - Projects write: {} ", ProjectItemWriter.class.getSimpleName(), l);
-                projectMongoService.saveAllProject(l);
+        public void write(List<? extends Collection<Project>> projects) throws Exception {
+            log.info("ProjectItemWriter.write execute.");
+            projects.forEach(p -> {
+                log.info("ProjectItemWriter.write execute: {}", p.toString());
+                projectMongoService.saveAllProject(p);
             });
+        }
+
+        @Override
+        public void beforeStep(StepExecution stepExecution) {
+            log.info("ProjectItemWriter.write initialized.");
+        }
+
+        @Override
+        public ExitStatus afterStep(StepExecution stepExecution) {
+            log.info("ProjectItemWriter.write ended.");
+            return ExitStatus.COMPLETED;
         }
     }
 }

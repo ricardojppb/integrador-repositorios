@@ -4,8 +4,10 @@ server:
 spring:
   batch:
     job:
-      enabled: false
+      enabled: true
     initialize-schema: always
+  main:
+    allow-bean-definition-overriding: true
   data:
     mongodb:
       host: localhost
@@ -14,7 +16,13 @@ spring:
       password: root
       username: root
       authentication-database: admin
-      #uri: mongodb://root:root@localhost/repos
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    password: root
+    jdbcUrl: jdbc:mysql://localhost:3306/repos?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+
+  #uri: mongodb://root:root@localhost/repos
 
 #autoconfigure:
 #exclude: org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
