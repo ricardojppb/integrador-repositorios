@@ -53,22 +53,23 @@ public class CommitMongoService extends GenericService {
             AtomicReference<Integer> start = new AtomicReference<>(0);
             Optional.ofNullable(commit).ifPresent(c -> start.set(c.getIndex() + 1));
 
-            HttpResponse<Commits> response = Unirest.get(gitProperties.getRepos())
+            HttpResponse<Commits> response = Unirest.get(gitProperties.getCommits())
                     .routeParam("projects", project.getKey())
                     .routeParam("repos", repository.getSlug())
-                    .routeParam("branch", branche.getId())
+                    .routeParam("branch", branche.getDisplayId())
                     .routeParam("start", start.get().toString())
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                     .header("Authorization", gitProperties.getToken()).asObject(Commits.class);
 
             if (response.getStatus() == HttpStatus.OK.value()) {
 
-                Commits responseBodyCommits = response.getBody();
-                Collection<Commit> cCommits = responseBodyCommits.getValues();
-                cCommits.forEach(cb -> {
-                    cb.setBranche(branche);
+                Optional.ofNullable(response.getBody()).ifPresent(responseBodyCommits -> {
+                    Collection<Commit> cCommits = responseBodyCommits.getValues();
+                    cCommits.forEach(cb -> {
+                        cb.setBranche(branche);
+                    });
+                    commits.add(responseBodyCommits);
                 });
-                Optional.ofNullable(responseBodyCommits).ifPresent(oc -> commits.add(oc));
             }
         });
 

@@ -63,11 +63,11 @@ public class ProjectMongoService extends GenericService {
         AtomicReference<Collection<Project>> projectCollection = new AtomicReference<>();
         Optional.ofNullable(projects).ifPresent(p -> {
 
-            projectCollection.set(projects.getValues());
+            projectCollection.set(p.getValues());
 
             projectCollection.get().removeIf(project -> projectMongoRepository.existsById(project.getId()));
 
-            AtomicInteger index = new AtomicInteger(projects.getStart().intValue());
+            AtomicInteger index = new AtomicInteger(p.getStart().intValue());
             projectCollection.get().forEach(project -> {
                 project.setIndex(index.getAndIncrement());
             });

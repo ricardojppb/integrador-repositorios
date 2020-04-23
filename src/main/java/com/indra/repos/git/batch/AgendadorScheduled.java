@@ -8,6 +8,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -51,16 +52,41 @@ public class AgendadorScheduled {
         executarBatch("jobGitCommit");
     }
 
+    @Async
+    @Scheduled(fixedDelay = HORA * 20, initialDelay = MINUTO)
+    public void agendadorJobProjectTasklet() {
+        executarBatch("jobProjectTasklet");
+    }
+
+    @Async
+    @Scheduled(fixedDelay = MINUTO * 15, initialDelay = MINUTO)
+    public void agendadorJobRepositoryTasklet() {
+        executarBatch("jobRepositoryTasklet");
+    }
+
+    @Async
+    @Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
+    public void agendadorJobBranchTasklet() {
+        executarBatch("jobBranchTasklet");
+    }
+
+    @Async
+    @Scheduled(fixedDelay = MINUTO * 5, initialDelay = MINUTO)
+    public void agendadorJobCommitTasklet() {
+        executarBatch("jobCommitTasklet");
+    }
+
     @PostConstruct
     public void start() {
-        //agendadorJobRepository();
-        agendadorJobBranche();
-        //agendadorJobCommit();
-        //agendadorJobProject();
+
+        agendadorJobProjectTasklet();
+        agendadorJobRepositoryTasklet();
+        agendadorJobBranchTasklet();
+        agendadorJobCommitTasklet();
 
     }
 
-    public void executarBatch(String jobId) {
+    private void executarBatch(String jobId) {
         try {
             JobParameters params = new JobParametersBuilder()
                     .addLong("ID", System.currentTimeMillis()).toJobParameters();

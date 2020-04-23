@@ -57,7 +57,13 @@ public class RepositoryMongoService extends GenericService {
                     .header("Authorization", gitProperties.getToken()).asObject(Repositories.class);
 
             if (response.getStatus() == HttpStatus.OK.value()) {
-
+                Optional.ofNullable(response.getBody()).ifPresent(responseBodyRepositories -> {
+                    Collection<Repository> cRepos = responseBodyRepositories.getValues();
+                    cRepos.forEach(cr -> {
+                        cr.setProject(p);
+                    });
+                    repositories.add(responseBodyRepositories);
+                });
                 Repositories responseBodyRepositories = response.getBody();
                 Collection<Repository> cRepos = responseBodyRepositories.getValues();
                 cRepos.forEach(cr -> {
@@ -81,6 +87,7 @@ public class RepositoryMongoService extends GenericService {
         Optional.ofNullable(repositories).ifPresent(repos -> {
             repos.forEach(r -> {
                 Collection<Repository> cRepository = r.getValues();
+
                 cRepository.removeIf(repository -> repositoryMongoRepository.existsByIdAndProject(repository.getId(), repository.getProject()));
 
                 AtomicInteger index = new AtomicInteger(r.getStart().intValue());

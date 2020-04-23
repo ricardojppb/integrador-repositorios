@@ -63,12 +63,14 @@ public class BranchMongoService extends GenericService {
 
             if (response.getStatus() == HttpStatus.OK.value()) {
 
-                Branches responseBodyBranches = response.getBody();
-                Collection<Branche> cBranches = responseBodyBranches.getValues();
-                cBranches.forEach(cb -> {
-                    cb.setRepository(repository);
+                Optional.ofNullable(response.getBody()).ifPresent(responseBodyBranches -> {
+                    Collection<Branche> cBranches = responseBodyBranches.getValues();
+                    cBranches.forEach(cb -> {
+                        cb.setRepository(repository);
+                    });
+                    branches.add(responseBodyBranches);
                 });
-                Optional.ofNullable(responseBodyBranches).ifPresent(ob -> branches.add(ob));
+
             }
         });
 

@@ -47,13 +47,6 @@ public class IntegradorRepositoriosApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-//        if (args != null) {
-//            for (String arg : args) {
-//                if (arg.toLowerCase().contains("job")) {
-//                    context.getBean(AgendadorScheduled.class).executarBatch(arg);
-//                }
-//            }
-//        }
     }
 
     @Bean
