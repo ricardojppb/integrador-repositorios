@@ -1,21 +1,19 @@
 package com.indra.repos.git.model.service;
 
-import com.indra.repos.git.model.domain.mongo.Project;
-import com.indra.repos.git.model.domain.mongo.Repository;
-import com.indra.repos.git.model.dto.mongo.Repositories;
-import com.indra.repos.git.model.repository.ProjectMongoRepository;
-import com.indra.repos.git.model.repository.RepositoryMongoRepository;
+import com.indra.repos.git.model.domain.mysql.Project;
+import com.indra.repos.git.model.domain.mysql.Repository;
+import com.indra.repos.git.model.dto.mysql.Repositories;
+import com.indra.repos.git.model.repository.ProjectRepository;
+import com.indra.repos.git.model.repository.ReposRepository;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,13 +22,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
-public class RepositoryMongoService extends GenericService {
+public class RepositoryService extends GenericService {
 
     @Autowired
-    private RepositoryMongoRepository repositoryMongoRepository;
+    private ReposRepository reposRepository;
 
     @Autowired
-    private ProjectMongoRepository projectMongoRepository;
+    private ProjectRepository projectRepository;
 
     /**
      * @return
@@ -39,13 +37,15 @@ public class RepositoryMongoService extends GenericService {
 
         Collection<Repositories> repositories = new ConcurrentLinkedQueue<>();
 
-        Collection<Project> projects = projectMongoRepository.findAll();
+        Collection<Project> projects = projectRepository.findAll();
         projects.forEach(p -> {
 
-            Query query = new Query();
-            query.addCriteria(Criteria.where("project").is(p));
-            query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
-            Repository repository = mongoTemplate.findOne(query, Repository.class);
+//            Query query = new Query();
+//            query.addCriteria(Criteria.where("project").is(p));
+//            query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
+//            Repository repository = mongoTemplate.findOne(query, Repository.class);
+
+            Repository repository = reposRepository.obterRepositorytOrderByIndexDescLimitUm();
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
             Optional.ofNullable(repository).ifPresent(r -> start.set(r.getIndex() + 1));
@@ -88,7 +88,7 @@ public class RepositoryMongoService extends GenericService {
             repos.forEach(r -> {
                 Collection<Repository> cRepository = r.getValues();
 
-                cRepository.removeIf(repository -> repositoryMongoRepository.existsByIdAndProject(repository.getId(), repository.getProject()));
+                cRepository.removeIf(repository -> reposRepository.existsByIdAndProject(repository.getId(), repository.getProject()));
 
                 AtomicInteger index = new AtomicInteger(r.getStart().intValue());
                 cRepository.forEach(repository -> {
@@ -105,9 +105,10 @@ public class RepositoryMongoService extends GenericService {
     /**
      * @param repositories
      */
+    @Transactional
     public void saveAllRepositories(Collection<Repository> repositories) {
 
-        Optional.ofNullable(repositories).ifPresent(repository -> repositoryMongoRepository.saveAll(repository));
+        Optional.ofNullable(repositories).ifPresent(repository -> reposRepository.saveAll(repository));
 
     }
 

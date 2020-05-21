@@ -19,7 +19,7 @@ spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     password: root
-    jdbcUrl: jdbc:mysql://localhost:3306/repos?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    jdbcUrl: jdbc:mysql://localhost:3306/repos?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false
     username: root
 
   #uri: mongodb://root:root@localhost/repos

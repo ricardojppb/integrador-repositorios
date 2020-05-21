@@ -1,4 +1,4 @@
-package com.indra.repos.git.model.dto;
+package com.indra.repos.git.model.dto.mongo;
 
 import lombok.Data;
 import lombok.Getter;

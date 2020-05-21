@@ -1,6 +1,6 @@
-package com.indra.repos.git.model.dto;
+package com.indra.repos.git.model.dto.mongo;
 
-import com.indra.repos.git.model.domain.Commit;
+import com.indra.repos.git.model.domain.mongo.Commit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
@@ -30,6 +31,7 @@ import java.util.concurrent.Executors;
 @EnableAsync
 @EnableScheduling
 @ComponentScan(basePackages = {"com.indra.repos"})
+@EnableJpaAuditing
 public class IntegradorRepositoriosApplication implements CommandLineRunner {
 
     @Autowired

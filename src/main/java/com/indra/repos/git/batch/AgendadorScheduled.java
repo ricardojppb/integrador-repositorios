@@ -8,7 +8,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -29,60 +28,87 @@ public class AgendadorScheduled {
 
 
     //@Scheduled(fixedDelay = HORA * 12, initialDelay = MINUTO)
+//    @Async
+//    public void agendadorJobProject() {
+//        executarBatch("jobGitProject");
+//    }
+//
+//    //@Scheduled(fixedDelay = MINUTO * 30, initialDelay = MINUTO)
+//    @Async
+//    public void agendadorJobRepository() {
+//        executarBatch("jobGitRepository");
+//    }
+//
+//    //@Scheduled(fixedDelay = HORA * 12, initialDelay = MINUTO)
+//    @Async
+//    public void agendadorJobBranche() {
+//        executarBatch("jobGitBranche");
+//    }
+//
+//    //@Scheduled(fixedDelay = MINUTO * 30, initialDelay = MINUTO)
+//    @Async
+//    public void agendadorJobCommit() {
+//        executarBatch("jobGitCommit");
+//    }
+//
+//    @Async
+//    //@Scheduled(fixedDelay = HORA * 20, initialDelay = MINUTO)
+//    public void agendadorJobProjectTasklet() {
+//        executarBatch("jobProjectTasklet");
+//    }
+//
+//    @Async
+//    //@Scheduled(fixedDelay = MINUTO * 15, initialDelay = MINUTO)
+//    public void agendadorJobRepositoryTasklet() {
+//        executarBatch("jobRepositoryTasklet");
+//    }
+//
+//    @Async
+//    //@Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
+//    public void agendadorJobBranchTasklet() {
+//        executarBatch("jobBranchTasklet");
+//    }
+//
+//    @Async
+//    //@Scheduled(fixedDelay = MINUTO * 5, initialDelay = MINUTO)
+//    public void agendadorJobCommitTasklet() {
+//        executarBatch("jobCommitTasklet");
+//    }
+
     @Async
-    public void agendadorJobProject() {
-        executarBatch("jobGitProject");
+    //@Scheduled(fixedDelay = HORA * 20, initialDelay = MINUTO)
+    public void agendadorJobGitBitbucketProjectTasklet() {
+        executarBatch("jobGitBitbucketProjectTasklet");
     }
 
-    //@Scheduled(fixedDelay = MINUTO * 30, initialDelay = MINUTO)
     @Async
-    public void agendadorJobRepository() {
-        executarBatch("jobGitRepository");
-    }
-
-    //@Scheduled(fixedDelay = HORA * 12, initialDelay = MINUTO)
-    @Async
-    public void agendadorJobBranche() {
-        executarBatch("jobGitBranche");
-    }
-
-    //@Scheduled(fixedDelay = MINUTO * 30, initialDelay = MINUTO)
-    @Async
-    public void agendadorJobCommit() {
-        executarBatch("jobGitCommit");
+    //@Scheduled(fixedDelay = MINUTO * 15, initialDelay = MINUTO)
+    public void agendadorJobGitBitbucketRepositoryTasklet() {
+        executarBatch("jobGitBitbucketRepositoryTasklet");
     }
 
     @Async
-    @Scheduled(fixedDelay = HORA * 20, initialDelay = MINUTO)
-    public void agendadorJobProjectTasklet() {
-        executarBatch("jobProjectTasklet");
+    //@Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
+    public void agendadorJobGitBitbucketBranchTasklet() {
+        executarBatch("jobGitBitbucketBranchTasklet");
     }
 
     @Async
-    @Scheduled(fixedDelay = MINUTO * 15, initialDelay = MINUTO)
-    public void agendadorJobRepositoryTasklet() {
-        executarBatch("jobRepositoryTasklet");
+    //@Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
+    public void agendadorJobGitBitbucketCommitTasklet() {
+        executarBatch("jobGitBitbucketCommitTasklet");
     }
 
-    @Async
-    @Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
-    public void agendadorJobBranchTasklet() {
-        executarBatch("jobBranchTasklet");
-    }
-
-    @Async
-    @Scheduled(fixedDelay = MINUTO * 5, initialDelay = MINUTO)
-    public void agendadorJobCommitTasklet() {
-        executarBatch("jobCommitTasklet");
-    }
 
     @PostConstruct
     public void start() {
 
-        agendadorJobProjectTasklet();
-        agendadorJobRepositoryTasklet();
-        agendadorJobBranchTasklet();
-        agendadorJobCommitTasklet();
+        //agendadorJobProjectTasklet();
+        //agendadorJobRepositoryTasklet();
+        //agendadorJobBranchTasklet();
+        //agendadorJobCommitTasklet();
+
+        //agendadorJobGitBitbucketProjectTasklet();
 
     }
 

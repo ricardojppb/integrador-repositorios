@@ -1,18 +1,19 @@
-package com.indra.repos.git.model.dto;
+package com.indra.repos.git.model.dto.mongo;
 
-import com.indra.repos.git.model.domain.Repository;
+import com.indra.repos.git.model.domain.mongo.Project;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 @Getter
 @Setter
 @ToString
-public class Repositories {
+public class Projects implements Serializable {
 
-    Collection<Repository> values;
+    Collection<Project> values;
     private Integer size;
     private Integer start;
     private Integer limit;

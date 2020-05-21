@@ -1,6 +1,6 @@
-package com.indra.repos.git.model.dto;
+package com.indra.repos.git.model.dto.mongo;
 
-import com.indra.repos.git.model.domain.Project;
+import com.indra.repos.git.model.domain.mongo.Branch;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,9 +11,9 @@ import java.util.Collection;
 @Getter
 @Setter
 @ToString
-public class Projects implements Serializable {
+public class Branches implements Serializable {
 
-    Collection<Project> values;
+    Collection<Branch> values;
     private Integer size;
     private Integer start;
     private Integer limit;

@@ -1,23 +1,21 @@
 package com.indra.repos.git.model.service;
 
-import com.indra.repos.git.model.domain.mongo.Branch;
-import com.indra.repos.git.model.domain.mongo.Commit;
-import com.indra.repos.git.model.domain.mongo.Project;
-import com.indra.repos.git.model.domain.mongo.Repository;
-import com.indra.repos.git.model.dto.mongo.Commits;
-import com.indra.repos.git.model.repository.BrancheMongoRepository;
-import com.indra.repos.git.model.repository.CommitMongoRepository;
+import com.indra.repos.git.model.domain.mysql.Branch;
+import com.indra.repos.git.model.domain.mysql.Commit;
+import com.indra.repos.git.model.domain.mysql.Project;
+import com.indra.repos.git.model.domain.mysql.Repository;
+import com.indra.repos.git.model.dto.mysql.Commits;
+import com.indra.repos.git.model.repository.BranchRepository;
+import com.indra.repos.git.model.repository.CommitRepository;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -26,29 +24,31 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
-public class CommitMongoService extends GenericService {
+public class CommitService extends GenericService {
 
     @Autowired
-    private CommitMongoRepository commitMongoRepository;
+    private CommitRepository commitRepository;
 
     @Autowired
-    private BrancheMongoRepository brancheMongoRepository;
+    private BranchRepository branchRepository;
 
     public Collection<Commits> restGetCommits() {
 
         Collection<Commits> commits = new ConcurrentLinkedQueue<>();
 
-        Collection<Branch> branches = brancheMongoRepository.findAll();
+        Collection<Branch> branches = branchRepository.findAll();
 
         branches.forEach(branche -> {
 
             Repository repository = branche.getRepository();
             Project project = repository.getProject();
 
-            Query query = new Query();
-            query.addCriteria(Criteria.where("branche").is(branche));
-            query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
-            Commit commit = mongoTemplate.findOne(query, Commit.class);
+//            Query query = new Query();
+//            query.addCriteria(Criteria.where("branche").is(branche));
+//            query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
+//            Commit commit = mongoTemplate.findOne(query, Commit.class);
+
+            Commit commit = commitRepository.obterCommitOrderByIndexDescLimitUm();
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
             Optional.ofNullable(commit).ifPresent(c -> start.set(c.getIndex() + 1));
@@ -86,7 +86,7 @@ public class CommitMongoService extends GenericService {
         Optional.ofNullable(commits).ifPresent(oCommits -> {
             oCommits.forEach(oc -> {
                 Collection<Commit> cCommit = oc.getValues();
-                cCommit.removeIf(commit -> commitMongoRepository.existsByIdAndBranch(commit.getId(), commit.getBranch()));
+                cCommit.removeIf(commit -> commitRepository.existsByIdAndBranch(commit.getId(), commit.getBranch()));
 
                 AtomicInteger index = new AtomicInteger(oc.getStart().intValue());
                 cCommit.forEach(commit -> {
@@ -102,9 +102,10 @@ public class CommitMongoService extends GenericService {
     /**
      * @param commits
      */
+    @Transactional
     public void saveAllCommits(Collection<Commit> commits) {
 
-        Optional.ofNullable(commits).ifPresent(commit -> commitMongoRepository.saveAll(commit));
+        Optional.ofNullable(commits).ifPresent(commit -> commitRepository.saveAll(commit));
 
     }
 

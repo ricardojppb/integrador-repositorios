@@ -1,4 +1,4 @@
-package com.indra.repos.git.model.domain;
+package com.indra.repos.git.model.domain.mongo;
 
 import lombok.Data;
 import lombok.Getter;
@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -21,12 +20,12 @@ import java.io.Serializable;
 //@CompoundIndexes({
 //        @CompoundIndex(name = "email_age", def = "{'email.id' : 1, 'age': 1}")
 //})
-public class Branche implements Serializable {
+public class Branch implements Serializable {
 
     @Id
     private ObjectId sq;
 
-    @Indexed
+    //@Indexed
     @Field("branche_id")
     private String id;
     @Field("branche_ref")
@@ -35,12 +34,11 @@ public class Branche implements Serializable {
     private String latestCommit;
     private String latestChangeset;
     private Boolean isDefault;
-    @Indexed
+    //@Indexed
     private int index;
     @DBRef
-    @Indexed(name = "Branche_Repository")
+    //@Indexed(name = "Branche_Repository")
     private Repository repository;
-
 
 
 }

@@ -1,18 +1,17 @@
 package com.indra.repos.git.model.service;
 
-import com.indra.repos.git.model.domain.mongo.Project;
-import com.indra.repos.git.model.dto.mongo.Projects;
-import com.indra.repos.git.model.repository.ProjectMongoRepository;
+import com.indra.repos.git.model.domain.mysql.Project;
+import com.indra.repos.git.model.dto.mysql.Projects;
+import com.indra.repos.git.model.repository.ProjectRepository;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,10 +19,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
-public class ProjectMongoService extends GenericService {
+public class ProjectService extends GenericService {
 
     @Autowired
-    private ProjectMongoRepository projectMongoRepository;
+    private ProjectRepository projectRepository;
 
 
     /**
@@ -33,9 +32,8 @@ public class ProjectMongoService extends GenericService {
 
         //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
         Projects projects = null;
-        Query query = new Query();
-        query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
-        Project project = mongoTemplate.findOne(query, Project.class);
+
+        Project project = projectRepository.obterProjectOrderByIndexDescLimitUm();
 
         AtomicReference<Integer> start = new AtomicReference<>(0);
         Optional.ofNullable(project).ifPresent(p -> start.set(p.getIndex() + 1));
@@ -64,8 +62,7 @@ public class ProjectMongoService extends GenericService {
         Optional.ofNullable(projects).ifPresent(p -> {
 
             projectCollection.set(p.getValues());
-
-            projectCollection.get().removeIf(project -> projectMongoRepository.existsById(project.getId()));
+            projectCollection.get().removeIf(project -> projectRepository.existsById(project.getId()));
 
             AtomicInteger index = new AtomicInteger(p.getStart().intValue());
             projectCollection.get().forEach(project -> {
@@ -81,10 +78,11 @@ public class ProjectMongoService extends GenericService {
     /**
      * @param projects
      */
+    @Transactional
     public void saveAllProject(Collection<Project> projects) {
         //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
 
-        Optional.ofNullable(projects).ifPresent(p -> projectMongoRepository.saveAll(p));
+        Optional.ofNullable(projects).ifPresent(p -> projectRepository.saveAll(p));
 
         //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
     }

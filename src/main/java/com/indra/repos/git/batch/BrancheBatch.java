@@ -1,7 +1,7 @@
 package com.indra.repos.git.batch;
 
-import com.indra.repos.git.model.domain.Branche;
-import com.indra.repos.git.model.dto.Branches;
+import com.indra.repos.git.model.domain.mongo.Branch;
+import com.indra.repos.git.model.dto.mongo.Branches;
 import com.indra.repos.git.model.service.BranchMongoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
@@ -43,7 +43,7 @@ public class BrancheBatch {
     @Bean
     public Step stepGitBranche() {
         return stepBuilderFactory.get("stepGitBranche")
-                .<Collection<Branches>, Collection<Branche>>chunk(TRANSACTION_SIZE)
+                .<Collection<Branches>, Collection<Branch>>chunk(TRANSACTION_SIZE)
                 .reader(new BrancheItemReader())
                 .processor(new BrancheItemProcessor())
                 .writer(new BrancheItemWriter()).build();
@@ -95,10 +95,10 @@ public class BrancheBatch {
     /**
      *
      */
-    public class BrancheItemProcessor implements ItemProcessor<Collection<Branches>, Collection<Branche>> {
+    public class BrancheItemProcessor implements ItemProcessor<Collection<Branches>, Collection<Branch>> {
 
         @Override
-        public Collection<Branche> process(Collection<Branches> branches) throws Exception {
+        public Collection<Branch> process(Collection<Branches> branches) throws Exception {
             log.info("BrancheItemProcessor.process execute.");
             return branchMongoService.mongoGetBranches(branches);
         }
@@ -107,10 +107,10 @@ public class BrancheBatch {
     /**
      *
      */
-    public class BrancheItemWriter implements ItemWriter<Collection<Branche>>, StepExecutionListener {
+    public class BrancheItemWriter implements ItemWriter<Collection<Branch>>, StepExecutionListener {
 
         @Override
-        public void write(List<? extends Collection<Branche>> branches) throws Exception {
+        public void write(List<? extends Collection<Branch>> branches) throws Exception {
             log.info("BrancheItemWriter.write execute.");
             branches.forEach(branche -> {
                 log.info("BrancheItemWriter.write execute: {}", branche.toString());

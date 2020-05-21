@@ -1,8 +1,8 @@
 package com.indra.repos.git.batch;
 
-import com.indra.repos.git.model.domain.Repository;
-import com.indra.repos.git.model.dto.Repositories;
-import com.indra.repos.git.model.service.RepositoryMongoService;
+import com.indra.repos.git.model.domain.mysql.Repository;
+import com.indra.repos.git.model.dto.mysql.Repositories;
+import com.indra.repos.git.model.service.RepositoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -21,39 +21,36 @@ import java.util.Collection;
 @Configuration
 public class GitBitbucketRepositoryBatch {
 
+    Collection<Repositories> repositoriesCollection = null;
+    Collection<Repository> repositoryCollection = null;
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
-
     @Autowired
-    private RepositoryMongoService repositoryMongoService;
-
-    Collection<Repositories> repositoriesCollection = null;
-    Collection<Repository> repositoryCollection = null;
-
+    private RepositoryService repositoryService;
 
     @Bean
-    public Step stepRepositoryReaderTasklet() {
-        return this.stepBuilderFactory.get("stepRepositoryReaderTasklet").tasklet(new Tasklet() {
+    public Step stepGitBitbucketRepositoryReaderTasklet() {
+        return this.stepBuilderFactory.get("stepGitBitbucketRepositoryReaderTasklet").tasklet(new Tasklet() {
             @Override
             public RepeatStatus execute(StepContribution stepContribution,
                                         ChunkContext chunkContext) throws Exception {
                 log.info("stepRepositoryReaderTasklet execute.");
-                repositoriesCollection = repositoryMongoService.restGetRepositories();
+                repositoriesCollection = repositoryService.restGetRepositories();
                 return RepeatStatus.FINISHED;
             }
         }).build();
     }
 
     @Bean
-    public Step stepRepositoryProcessorTasklet() {
-        return this.stepBuilderFactory.get("stepRepositoryProcessorTasklet").tasklet(new Tasklet() {
+    public Step stepGitBitbucketRepositoryProcessorTasklet() {
+        return this.stepBuilderFactory.get("stepGitBitbucketRepositoryProcessorTasklet").tasklet(new Tasklet() {
             @Override
             public RepeatStatus execute(StepContribution stepContribution,
                                         ChunkContext chunkContext) throws Exception {
                 log.info("stepRepositoryProcessorTasklet execute.");
-                repositoryCollection = repositoryMongoService.mongoGetRepositories(repositoriesCollection);
+                repositoryCollection = repositoryService.mongoGetRepositories(repositoriesCollection);
 
                 return RepeatStatus.FINISHED;
             }
@@ -61,13 +58,13 @@ public class GitBitbucketRepositoryBatch {
     }
 
     @Bean
-    public Step stepRepositoryWriterTasklet() {
-        return this.stepBuilderFactory.get("stepRepositoryWriterTasklet").tasklet(new Tasklet() {
+    public Step stepGitBitbucketRepositoryWriterTasklet() {
+        return this.stepBuilderFactory.get("stepGitBitbucketRepositoryWriterTasklet").tasklet(new Tasklet() {
             @Override
             public RepeatStatus execute(StepContribution stepContribution,
                                         ChunkContext chunkContext) throws Exception {
                 log.info("stepRepositoryWriterTasklet execute.");
-                repositoryMongoService.saveAllRepositories(repositoryCollection);
+                repositoryService.saveAllRepositories(repositoryCollection);
 
                 return RepeatStatus.FINISHED;
             }
@@ -75,18 +72,18 @@ public class GitBitbucketRepositoryBatch {
     }
 
     @Bean
-    public Job jobRepositoryTasklet(JobCompletionNotificationListener listener,
-                                    Step stepRepositoryReaderTasklet,
-                                    Step stepRepositoryProcessorTasklet,
-                                    Step stepRepositoryWriterTasklet) {
+    public Job jobGitBitbucketRepositoryTasklet(JobCompletionNotificationListener listener,
+                                                Step stepGitBitbucketRepositoryReaderTasklet,
+                                                Step stepGitBitbucketRepositoryProcessorTasklet,
+                                                Step stepGitBitbucketRepositoryWriterTasklet) {
 
-        return jobBuilderFactory.get("jobRepositoryTasklet")
+        return jobBuilderFactory.get("jobGitBitbucketRepositoryTasklet")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .listener(new GitBitbucketRepositoryBatch.JobResultListener())
-                .start(stepRepositoryReaderTasklet)
-                .next(stepRepositoryProcessorTasklet)
-                .next(stepRepositoryWriterTasklet).build();
+                .start(stepGitBitbucketRepositoryReaderTasklet)
+                .next(stepGitBitbucketRepositoryProcessorTasklet)
+                .next(stepGitBitbucketRepositoryWriterTasklet).build();
     }
 
     public class JobResultListener implements JobExecutionListener {

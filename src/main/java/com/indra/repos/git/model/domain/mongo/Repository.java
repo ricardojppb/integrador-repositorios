@@ -1,4 +1,4 @@
-package com.indra.repos.git.model.domain;
+package com.indra.repos.git.model.domain.mongo;
 
 import lombok.Data;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -16,19 +16,22 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-@Document(collection = "projects")
-public class Project implements Serializable {
+@Document(collection = "repositories")
+public class Repository implements Serializable {
 
     @Id
     private ObjectId sq;
-    @Indexed
-    @Field("project_id")
+
+    //@Indexed
+    @Field("repository_id")
     private Integer id;
-    private String key;
+    private String slug;
     private String name;
     private String description;
-    private String type;
-    @Indexed
+    //@Indexed
     private int index;
+    @DBRef
+    //@Indexed(name = "Repository_Project")
+    private Project project;
 
 }

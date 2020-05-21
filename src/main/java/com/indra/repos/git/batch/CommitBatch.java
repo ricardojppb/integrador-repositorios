@@ -1,7 +1,7 @@
 package com.indra.repos.git.batch;
 
-import com.indra.repos.git.model.domain.Commit;
-import com.indra.repos.git.model.dto.Commits;
+import com.indra.repos.git.model.domain.mongo.Commit;
+import com.indra.repos.git.model.dto.mongo.Commits;
 import com.indra.repos.git.model.service.CommitMongoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
