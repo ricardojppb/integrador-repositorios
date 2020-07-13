@@ -44,15 +44,10 @@ public class BranchService extends GenericService {
 
             Project project = repository.getProject();
 
-//            Query query = new Query();
-//            query.addCriteria(Criteria.where("repository").is(repository));
-//            query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
-//            Branch branch = mongoTemplate.findOne(query, Branch.class);
-
-            Branch branch = branchRepository.obterBranchtOrderByIndexDescLimitUm();
+            Integer indiceMaximo = branchRepository.obterIndexMaxBranchWhereRepository(repository.getSqRepository());
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
-            Optional.ofNullable(branch).ifPresent(b -> start.set(b.getIndex() + 1));
+            Optional.ofNullable(indiceMaximo).ifPresent(max -> start.set(max + 1));
 
             HttpResponse<Branches> response = Unirest.get(gitProperties.getBranches())
                     .routeParam("projects", project.getKey())
@@ -62,6 +57,11 @@ public class BranchService extends GenericService {
                     .header("Authorization", gitProperties.getToken()).asObject(Branches.class);
 
             if (response.getStatus() == HttpStatus.OK.value()) {
+
+                response.getParsingError().ifPresent(e -> {
+                    e.getOriginalBody();
+                    e.getMessage();
+                });
 
                 Optional.ofNullable(response.getBody()).ifPresent(responseBodyBranches -> {
                     Collection<Branch> cBranches = responseBodyBranches.getValues();

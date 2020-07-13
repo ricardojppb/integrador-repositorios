@@ -76,27 +76,33 @@ public class AgendadorScheduled {
 //    }
 
     @Async
-    //@Scheduled(fixedDelay = HORA * 20, initialDelay = MINUTO)
+    //@org.springframework.scheduling.annotation.Scheduled(fixedDelay = HORA * 20, initialDelay = SEGUNDO * 10)
     public void agendadorJobGitBitbucketProjectTasklet() {
         executarBatch("jobGitBitbucketProjectTasklet");
     }
 
     @Async
-    //@Scheduled(fixedDelay = MINUTO * 15, initialDelay = MINUTO)
+    //@org.springframework.scheduling.annotation.Scheduled(fixedDelay = MINUTO * 5, initialDelay = SEGUNDO * 30)
     public void agendadorJobGitBitbucketRepositoryTasklet() {
         executarBatch("jobGitBitbucketRepositoryTasklet");
     }
 
     @Async
-    //@Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
+    //@org.springframework.scheduling.annotation.Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
     public void agendadorJobGitBitbucketBranchTasklet() {
         executarBatch("jobGitBitbucketBranchTasklet");
     }
 
     @Async
-    //@Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO)
+    //@org.springframework.scheduling.annotation.Scheduled(fixedDelay = MINUTO * 10, initialDelay = MINUTO * 2)
     public void agendadorJobGitBitbucketCommitTasklet() {
         executarBatch("jobGitBitbucketCommitTasklet");
+    }
+
+    @Async
+    @org.springframework.scheduling.annotation.Scheduled(fixedDelay = MINUTO * 15, initialDelay = SEGUNDO * 10)
+    public void agendadorJobGitBitbucketCommitChangeTasklet() {
+        executarBatch("jobGitBitbucketCommitChangeTasklet");
     }
 
 

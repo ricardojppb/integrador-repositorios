@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Data
 @Getter
@@ -21,11 +20,11 @@ public class Author extends AuditModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "sq_author")
     private Long sqAuthor;
-    @NotBlank
+
     private String name;
-    @NotBlank
+
     private String emailAddress;
-    @NotBlank
+
     private String displayName;
 
     public Long getSqAuthor() {

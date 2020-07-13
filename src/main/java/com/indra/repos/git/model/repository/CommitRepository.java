@@ -9,7 +9,7 @@ public interface CommitRepository extends JpaRepository<Commit, Long> {
 
     public boolean existsByIdAndBranch(String commitId, Branch branch);
 
-    @Query(value = "SELECT * FROM tb_commits ORDER BY  commit_index DESC LIMIT 1", nativeQuery = true)
-    public Commit obterCommitOrderByIndexDescLimitUm();
+    @Query(value = "SELECT max(commit_index) FROM tbgit_commits WHERE branche_fk = :branchFK", nativeQuery = true)
+    public Integer obterIndexMaxCommitWhereBranch(@org.springframework.data.repository.query.Param("branchFK") Long branchFK);
 
 }

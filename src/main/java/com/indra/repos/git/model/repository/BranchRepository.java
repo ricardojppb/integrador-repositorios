@@ -8,7 +8,7 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
 
     public boolean existsByIdAndRepository(String branchId, com.indra.repos.git.model.domain.mysql.Repository repository);
 
-    @Query(value = "SELECT * FROM tb_branches ORDER BY  branch_index DESC LIMIT 1", nativeQuery = true)
-    public Branch obterBranchtOrderByIndexDescLimitUm();
+    @Query(value = "SELECT MAX(branch_index) FROM tbgit_branches WHERE repository_fk = :repositoryFK", nativeQuery = true)
+    public Integer obterIndexMaxBranchWhereRepository(@org.springframework.data.repository.query.Param("repositoryFK") Long repositoryFK);
 
 }

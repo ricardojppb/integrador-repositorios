@@ -43,15 +43,10 @@ public class CommitService extends GenericService {
             Repository repository = branche.getRepository();
             Project project = repository.getProject();
 
-//            Query query = new Query();
-//            query.addCriteria(Criteria.where("branche").is(branche));
-//            query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
-//            Commit commit = mongoTemplate.findOne(query, Commit.class);
-
-            Commit commit = commitRepository.obterCommitOrderByIndexDescLimitUm();
+            Integer indiceMaximo = commitRepository.obterIndexMaxCommitWhereBranch(branche.getSqBranch());
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
-            Optional.ofNullable(commit).ifPresent(c -> start.set(c.getIndex() + 1));
+            Optional.ofNullable(indiceMaximo).ifPresent(max -> start.set(max + 1));
 
             HttpResponse<Commits> response = Unirest.get(gitProperties.getCommits())
                     .routeParam("projects", project.getKey())
@@ -61,7 +56,13 @@ public class CommitService extends GenericService {
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                     .header("Authorization", gitProperties.getToken()).asObject(Commits.class);
 
+
             if (response.getStatus() == HttpStatus.OK.value()) {
+
+                response.getParsingError().ifPresent(e -> {
+                    e.getOriginalBody();
+                    e.getMessage();
+                });
 
                 Optional.ofNullable(response.getBody()).ifPresent(responseBodyCommits -> {
                     Collection<Commit> cCommits = responseBodyCommits.getValues();

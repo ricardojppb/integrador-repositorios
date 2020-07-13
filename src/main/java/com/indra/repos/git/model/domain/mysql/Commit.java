@@ -41,7 +41,7 @@ public class Commit extends AuditModel {
     private String message;
 
     @NotNull
-    private Integer committerTimestamp;
+    private Long committerTimestamp;
 
     @NotNull
     @Column(name = "commit_index")
@@ -50,7 +50,6 @@ public class Commit extends AuditModel {
     @Transient
     private Date committerDate;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "author_fk", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -63,15 +62,6 @@ public class Commit extends AuditModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Branch branch;
-
-//    public Date getCommitterDate() {
-//        return new Date(this.committerTimestamp);
-//    }
-//
-//    public void setCommitterDate(Long committerTimestamp) {
-//        this.committerDate = new Date(committerTimestamp);
-//    }
-
 
     public Long getSqCommit() {
         return sqCommit;
@@ -105,11 +95,11 @@ public class Commit extends AuditModel {
         this.message = message;
     }
 
-    public Integer getCommitterTimestamp() {
+    public Long getCommitterTimestamp() {
         return committerTimestamp;
     }
 
-    public void setCommitterTimestamp(Integer committerTimestamp) {
+    public void setCommitterTimestamp(Long committerTimestamp) {
         this.committerTimestamp = committerTimestamp;
     }
 

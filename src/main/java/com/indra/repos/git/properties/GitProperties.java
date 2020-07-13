@@ -23,6 +23,8 @@ public class GitProperties {
     private String branches;
     @NotBlank
     private String commits;
+    @NotBlank
+    private String changes;
 
     public String getToken() {
         return token;
@@ -62,5 +64,13 @@ public class GitProperties {
 
     public void setCommits(String commits) {
         this.commits = commits;
+    }
+
+    public String getChanges() {
+        return changes;
+    }
+
+    public void setChanges(String changes) {
+        this.changes = changes;
     }
 }

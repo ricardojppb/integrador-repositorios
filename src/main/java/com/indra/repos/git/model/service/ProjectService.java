@@ -33,10 +33,10 @@ public class ProjectService extends GenericService {
         //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());
         Projects projects = null;
 
-        Project project = projectRepository.obterProjectOrderByIndexDescLimitUm();
+        Integer indiceMaximo = projectRepository.obterIndexMaxProject();
 
         AtomicReference<Integer> start = new AtomicReference<>(0);
-        Optional.ofNullable(project).ifPresent(p -> start.set(p.getIndex() + 1));
+        Optional.ofNullable(indiceMaximo).ifPresent(max -> start.set(max + 1));
 
         HttpResponse<Projects> response = Unirest.get(gitProperties.getProjects())
                 .routeParam("start", start.get().toString())
@@ -44,6 +44,11 @@ public class ProjectService extends GenericService {
                 .header("Authorization", gitProperties.getToken()).asObject(Projects.class);
 
         if (response.getStatus() == HttpStatus.OK.value())
+
+            response.getParsingError().ifPresent(e -> {
+                e.getOriginalBody();
+                e.getMessage();
+            });
             projects = response.getBody();
 
         //log.info("{}: Init Get Projects", ProjectMongoService.class.getName());

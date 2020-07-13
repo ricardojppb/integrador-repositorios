@@ -40,15 +40,10 @@ public class RepositoryService extends GenericService {
         Collection<Project> projects = projectRepository.findAll();
         projects.forEach(p -> {
 
-//            Query query = new Query();
-//            query.addCriteria(Criteria.where("project").is(p));
-//            query.with(Sort.by(Sort.Direction.DESC, "index")).limit(1);
-//            Repository repository = mongoTemplate.findOne(query, Repository.class);
-
-            Repository repository = reposRepository.obterRepositorytOrderByIndexDescLimitUm();
+            Integer indiceMaximo = reposRepository.obterIndexMaxRepositoryWhereProject(p.getSqProject());
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
-            Optional.ofNullable(repository).ifPresent(r -> start.set(r.getIndex() + 1));
+            Optional.ofNullable(indiceMaximo).ifPresent(max -> start.set(max + 1));
 
             HttpResponse<Repositories> response = Unirest.get(gitProperties.getRepos())
                     .routeParam("projects", p.getKey())
@@ -57,6 +52,12 @@ public class RepositoryService extends GenericService {
                     .header("Authorization", gitProperties.getToken()).asObject(Repositories.class);
 
             if (response.getStatus() == HttpStatus.OK.value()) {
+
+                response.getParsingError().ifPresent(e -> {
+                    e.getOriginalBody();
+                    e.getMessage();
+                });
+
                 Optional.ofNullable(response.getBody()).ifPresent(responseBodyRepositories -> {
                     Collection<Repository> cRepos = responseBodyRepositories.getValues();
                     cRepos.forEach(cr -> {
@@ -64,12 +65,6 @@ public class RepositoryService extends GenericService {
                     });
                     repositories.add(responseBodyRepositories);
                 });
-                Repositories responseBodyRepositories = response.getBody();
-                Collection<Repository> cRepos = responseBodyRepositories.getValues();
-                cRepos.forEach(cr -> {
-                    cr.setProject(p);
-                });
-                Optional.ofNullable(responseBodyRepositories).ifPresent(or -> repositories.add(or));
             }
 
         });

@@ -9,6 +9,6 @@ public interface ReposRepository extends JpaRepository<Repository, Long> {
 
     public boolean existsByIdAndProject(Integer repositoryId, Project project);
 
-    @Query(value = "SELECT * FROM tb_repositories ORDER BY repository_index DESC LIMIT 1", nativeQuery = true)
-    public Repository obterRepositorytOrderByIndexDescLimitUm();
+    @Query(value = "SELECT max(repository_index) FROM tbgit_repositories WHERE project_fk = :projectFK", nativeQuery = true)
+    public Integer obterIndexMaxRepositoryWhereProject(@org.springframework.data.repository.query.Param("projectFK") Long projectFK);
 }
