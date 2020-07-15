@@ -35,18 +35,18 @@ public class RepositoryService extends GenericService {
      */
     public Collection<Repositories> restGetRepositories() {
 
-        Collection<Repositories> repositories = new ConcurrentLinkedQueue<>();
+        Collection<Repositories> responseRepositories = new ConcurrentLinkedQueue<>();
 
         Collection<Project> projects = projectRepository.findAll();
-        projects.forEach(p -> {
+        projects.forEach(project -> {
 
-            Integer indiceMaximo = reposRepository.obterIndexMaxRepositoryWhereProject(p.getSqProject());
+            Integer indiceMaximo = reposRepository.obterIndexMaxRepositoryWhereProject(project.getSqProject());
 
             AtomicReference<Integer> start = new AtomicReference<>(0);
             Optional.ofNullable(indiceMaximo).ifPresent(max -> start.set(max + 1));
 
             HttpResponse<Repositories> response = Unirest.get(gitProperties.getRepos())
-                    .routeParam("projects", p.getKey())
+                    .routeParam("projects", project.getKey())
                     .routeParam("start", start.get().toString())
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                     .header("Authorization", gitProperties.getToken()).asObject(Repositories.class);
@@ -59,17 +59,17 @@ public class RepositoryService extends GenericService {
                 });
 
                 Optional.ofNullable(response.getBody()).ifPresent(responseBodyRepositories -> {
-                    Collection<Repository> cRepos = responseBodyRepositories.getValues();
-                    cRepos.forEach(cr -> {
-                        cr.setProject(p);
+                    Collection<Repository> repositories = responseBodyRepositories.getValues();
+                    repositories.forEach(repository -> {
+                        repository.setProject(project);
                     });
-                    repositories.add(responseBodyRepositories);
+                    responseRepositories.add(responseBodyRepositories);
                 });
             }
 
         });
 
-        return repositories;
+        return responseRepositories;
     }
 
     /**

@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.Transient;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
